@@ -27,7 +27,7 @@ captured_pices_black = []
 
 # 0 - whites turn, no selection: 1 - whites turn, pice selected: 2 - blacks turn, no selction: 3 - black turn, piece selected
 turn_step = 0
-selection = 100 # value of selected piece
+selection = 10 # value of selected piece
 valid_moves = []
 
 #load in game oice images (queen, king, roook, bishop, knight, pawn) x 2
@@ -115,12 +115,24 @@ def draw_pices():
         else:
             screen.blit(white_images[index], (white_locations[i][0] * 100 + 10, white_locations[i][1] * 100 + 10))
 
+        #highlight pices
+        if turn_step < 2:
+            #white's turn
+            if selection == i:
+                pygame.draw.rect(screen, 'red', [white_locations[i][0]*100 + 1,  white_locations[i][1]*100 + 1, 100, 100], 2)
+
+
     for i in range(len(black_pieces)):
         index = piece_list.index(black_pieces[i])
         if black_pieces[i] == 'pawn':
             screen.blit(black_pawn, (black_locations[i][0] * 100 + 22, black_locations[i][1] * 100 + 30))
         else: 
             screen.blit(black_images[index], (black_locations[i][0] * 100 + 10, black_locations[i][1] * 100 + 10))
+             #highlight pices
+        if turn_step >= 2:
+            #black's turn
+            if selection == i:
+                pygame.draw.rect(screen, 'blue', [black_locations[i][0]*100 + 1,  black_locations[i][1]*100 + 1, 100, 100], 2)
 
 
 #main game loop

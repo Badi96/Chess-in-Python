@@ -22,12 +22,12 @@ white_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0
 black_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
                    (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
 
-captured_pices_white = []
+captured_pieces_white = []
 captured_pices_black = []
 
 # 0 - whites turn, no selection: 1 - whites turn, pice selected: 2 - blacks turn, no selction: 3 - black turn, piece selected
 turn_step = 0
-selection = 10 # value of selected piece
+selection = 100 # value of selected piece
 valid_moves = []
 
 #load in game oice images (queen, king, roook, bishop, knight, pawn) x 2
@@ -135,6 +135,10 @@ def draw_pices():
                 pygame.draw.rect(screen, 'blue', [black_locations[i][0]*100 + 1,  black_locations[i][1]*100 + 1, 100, 100], 2)
 
 
+#function to check all pieces valid options on the board
+def check_options():
+    pass
+
 #main game loop
 run = True
 
@@ -144,10 +148,55 @@ while run:
     draw_board()
     draw_pices()
 
-    #Event handling (mouse, keyborard, etc.)
+    # Event handling (mouse, keyborard, etc.)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    
+        # check click event
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            x_coord = event.pos[0] // 100 # shows the x coordinate of click
+            y_coord = event.pos[1] // 100 # shows the y coordinate of click
+            click_coords = (x_coord, y_coord)
+            
+            if turn_step <= 1:
+                #White turn
+                if click_coords in white_locations:
+                    selection = white_locations.index(click_coords) # grabs the index of the pice
+                    if turn_step == 0:
+                        turn_step = 1 # change to select turn step
+                if click_coords in valid_moves and selection != 100:
+                    white_locations[selection] = click_coords
+                    if click_coords in black_locations:
+                        black_piece = black_locations.index(click_coords) #index of the captured black pice
+                        captured_pieces_white.append(black_pieces[black_piece])
+                        black_pieces.pop(black_piece)
+                        black_locations.pop(black_piece)
+                    black_options = check_options(black_pieces, black_locations, 'black')
+                    white_options = check_options(white_pieces, white_locations, 'white')
+                    turn_step = 2
+                    selection = 100 # to make no piece selected
+                    valid_moves = [] # for re-calculating the valid moves in new turn
+            
+            if turn_step > 1:
+                #White turn
+                if click_coords in black_locations:
+                    selection = black_locations.index(click_coords) # grabs the index of the pice
+                    if turn_step == 2:
+                        turn_step = 3 # change to select turn step
+                if click_coords in valid_moves and selection != 100:
+                    black_locations[selection] = click_coords
+                    if click_coords in white_locations:
+                        white_piece = white_locations.index(click_coords) #index of the captured black pice
+                        captured_pieces_black.append(white_pieces[white_piece])
+                        white_pieces.pop(white_piece)
+                        white_locations.pop(white_piece)
+                    black_options = check_options(black_pieces, black_locations, 'black')
+                    white_options = check_options(white_pieces, white_locations, 'white')
+                    turn_step = 0 
+                    selection = 100 # to make no piece selected
+                    valid_moves = [] # for re-calculating the valid moves in new turn
+
+
+
     pygame.display.flip()
 pygame.quit()
